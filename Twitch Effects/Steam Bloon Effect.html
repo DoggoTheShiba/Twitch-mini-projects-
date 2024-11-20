@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave of Balloons</title>
+    <style>
+        /* Container for the balloons (set to cover the screen and make the background transparent) */
+        .balloon-container {
+            position: fixed; /* Makes it overlay over the content */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Ensures balloons don't interfere with user interactions */
+            z-index: 9999; /* Ensures balloons are on top */
+        }
+
+        /* Common styles for each balloon */
+        .balloon {
+            position: absolute;
+            bottom: 0;
+        }
+
+        /* Keyframes for floating animation */
+        @keyframes floatUp {
+            0% { transform: translateY(100vh); }
+            100% { transform: translateY(-120vh); }
+        }
+    </style>
+</head>
+<body>
+    <div class="balloon-container" id="balloonContainer"></div>
+
+    <script>
+        // Array of balloon image URLs
+        const balloonImages = [
+            "https://cdn.fastly.steamstatic.com/steamcommunity/public/assets/winter2019/roomeffects/balloons/balloon_green.png",
+            "https://cdn.fastly.steamstatic.com/steamcommunity/public/assets/winter2019/roomeffects/balloons/balloon_red.png",
+            "https://cdn.fastly.steamstatic.com/steamcommunity/public/assets/winter2019/roomeffects/balloons/balloon_blue.png",
+            "https://cdn.fastly.steamstatic.com/steamcommunity/public/assets/winter2019/roomeffects/balloons/balloon_purple.png",
+            "https://cdn.fastly.steamstatic.com/steamcommunity/public/assets/winter2019/roomeffects/balloons/balloon_yellow.png",
+            "https://cdn.fastly.steamstatic.com/steamcommunity/public/assets/winter2019/roomeffects/balloons/balloon_cyan.png"
+        ];
+
+        // Number of balloons to release in a wave
+        const balloonWaveCount = 10;
+
+        // Function to create a random balloon, but ensure even distribution of each color
+        function createBalloon(color) {
+            const balloon = document.createElement("div");
+            balloon.classList.add("balloon");
+
+            // Set the balloon image based on the passed color
+            const balloonImg = document.createElement("img");
+            balloonImg.src = color;
+            balloonImg.style.width = `${100 + Math.random() * 100}px`;  // Slightly reduced size range
+            balloonImg.style.position = "absolute";
+
+            // Random horizontal position but within a small range to keep them close
+            balloon.style.left = `${Math.random() * 100}%`;  // Keeping the range narrow (25% to 75%)
+
+            // Apply animation with slight variations to make it look more natural
+            balloon.style.animation = `floatUp ${4 + Math.random() * 2}s linear`;  // Vary animation duration for each balloon
+
+            balloon.appendChild(balloonImg);
+
+            // Append the balloon to the container
+            document.getElementById("balloonContainer").appendChild(balloon);
+
+            // Remove the balloon after animation ends
+            setTimeout(() => {
+                balloon.remove();
+            }, 6000);  // Matches the animation duration
+        }
+
+        // Function to release a wave of balloons evenly
+        function releaseBalloonWave() {
+            const colorsCount = balloonImages.length;
+            const balloonsPerColor = Math.floor(balloonWaveCount / colorsCount);
+
+            for (let i = 0; i < colorsCount; i++) {
+                // Create an even distribution of balloons for each color
+                for (let j = 0; j < balloonsPerColor; j++) {
+                    createBalloon(balloonImages[i]);  // Create the balloon immediately without delay
+                }
+            }
+
+            // If balloonWaveCount is not divisible by colorsCount, distribute any remaining balloons
+            const remainingBalloons = balloonWaveCount % colorsCount;
+            for (let i = 0; i < remainingBalloons; i++) {
+                createBalloon(balloonImages[i]);
+            }
+        }
+
+        // Release the wave of balloons once on page load
+        window.onload = releaseBalloonWave;
+    </script>
+</body>
+</html>
